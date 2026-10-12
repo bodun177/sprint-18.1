@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import './App.css';
 import EntitiesList from './EntitiesList';
 import EntityDetails from './EntityDetails';
 import { fetchUsers, fetchUser } from '../api';
@@ -19,7 +18,7 @@ function App() {
         params={userId}
         propsToDisplay={{
           name: 'Name', username: 'Username', email: 'Email',
-          address: 'Address', city: 'City', street: 'Street', suite: 'Apartments',
+          city: 'City', street: 'Street', suite: 'Apartments',
           phone: 'Phone'
         }}
       />

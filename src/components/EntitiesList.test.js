@@ -1,51 +1,63 @@
-import renderer from "react-test-renderer";
-import EntitiesList from "../components/EntitiesList";
-import TestRenderer from "react-test-renderer";
-import { setImmediate } from "timers";
-import * as useLoadingContext from "./hooks/useLoading";
-import { render } from "@testing-library/react";
-
-const { act } = TestRenderer;
+import { fireEvent, render, screen } from "@testing-library/react";
+import EntitiesList from "./EntitiesList";
+import * as useLoadingModule from "./hooks/useLoading";
 
 describe("EntitiesList", () => {
-  it("renders correctly with data", async () => {
-    const wrapper = renderer.create(
-      <EntitiesList
-        fetchMethod={() =>
-          new Promise((resolve) => resolve([{ id: 101, name: "John" }]))
-        }
-        propsToDisplay={{ name: "Name" }}
-      />
-    );
-    await act(() => new Promise(setImmediate));
-
-    expect(wrapper.toJSON()).toMatchSnapshot();
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
-  it("renders loading without data", async () => {
-    const wrapper = renderer.create(
-      <EntitiesList
-        fetchMethod={() =>
-          new Promise((resolve) => resolve([{ id: 101, name: "John" }]))
-        }
-        propsToDisplay={{ name: "Name" }}
-      />
-    );
+  it("shows Loading while useLoading returns null", () => {
+    jest.spyOn(useLoadingModule, "useLoading").mockReturnValue(null);
 
-    expect(wrapper.toJSON()).toMatchSnapshot();
-  });
-
-  it("checks if useLoading was called", () => {
-    const mySpy = jest
-      .spyOn(useLoadingContext, "useLoading")
-      .mockImplementation(() => []);
     render(
       <EntitiesList
-        fetchMethod={() => new Promise(() => [])}
-        propsToDisplay={{}}
+        fetchMethod={() => Promise.resolve([])}
+        propsToDisplay={{ name: "Name" }}
+        onEntityDetailsClick={() => {}}
       />
     );
 
-    expect(mySpy).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("Loading...")).toBeInTheDocument();
+  });
+
+  it("renders the list returned by useLoading", () => {
+    const fetchMethod = () =>
+      Promise.resolve([{ id: 1, name: "From fetch" }]);
+    jest.spyOn(useLoadingModule, "useLoading").mockReturnValue([
+      { id: 101, name: "John" },
+    ]);
+
+    render(
+      <EntitiesList
+        fetchMethod={fetchMethod}
+        propsToDisplay={{ name: "Name" }}
+        onEntityDetailsClick={() => {}}
+      />
+    );
+
+    expect(screen.getByText("John")).toBeInTheDocument();
+    expect(screen.queryByText("From fetch")).not.toBeInTheDocument();
+    expect(useLoadingModule.useLoading).toHaveBeenCalledTimes(1);
+    expect(useLoadingModule.useLoading).toHaveBeenCalledWith(fetchMethod);
+  });
+
+  it("reports the clicked entity id", () => {
+    jest.spyOn(useLoadingModule, "useLoading").mockReturnValue([
+      { id: 101, name: "John" },
+    ]);
+    const onEntityDetailsClick = jest.fn();
+
+    render(
+      <EntitiesList
+        fetchMethod={() => Promise.resolve([])}
+        propsToDisplay={{ name: "Name" }}
+        onEntityDetailsClick={onEntityDetailsClick}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "👀" }));
+
+    expect(onEntityDetailsClick).toHaveBeenCalledWith(101);
   });
 });

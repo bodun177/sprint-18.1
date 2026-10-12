@@ -7,7 +7,6 @@ function EntityDetails({ fetchMethod, params, propsToDisplay }) {
     setEntity(null);
     fetchMethod(params).then((res) => {
       setEntity(res);
-      console.log("User: ", res);
     });
   }, [fetchMethod, params]);
 
@@ -15,7 +14,7 @@ function EntityDetails({ fetchMethod, params, propsToDisplay }) {
     <div className="center">
       <h3>{entity.name} Details:</h3>
       {Object.entries(propsToDisplay).map((entry) => (
-        <div key={entry[1]}>
+        <div key={entry[0]}>
           {" "}
           {entry[1]}: <strong>{entity[entry[0]]}</strong>
         </div>
