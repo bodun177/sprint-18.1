@@ -1,14 +1,7 @@
-import { useState, useEffect } from "react";
+import { useLoading } from "./hooks/useLoading";
 
 function EntityDetails({ fetchMethod, params, propsToDisplay }) {
-  const [entity, setEntity] = useState(null);
-
-  useEffect(() => {
-    setEntity(null);
-    fetchMethod(params).then((res) => {
-      setEntity(res);
-    });
-  }, [fetchMethod, params]);
+  const entity = useLoading(fetchMethod, params);
 
   return entity ? (
     <div className="center">

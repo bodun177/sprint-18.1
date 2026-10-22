@@ -1,14 +1,7 @@
-import { useState, useEffect } from "react";
+import { useLoading } from "./hooks/useLoading";
 
 function EntitiesList({ onEntityDetailsClick, propsToDisplay, fetchMethod }) {
-  const [entities, setEntities] = useState(null);
-
-  useEffect(() => {
-    setEntities(null);
-    fetchMethod().then((res) => {
-      setEntities(res);
-    });
-  }, [fetchMethod]);
+  const entities = useLoading(fetchMethod);
 
   return entities ? (
     <ul>
