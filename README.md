@@ -13,7 +13,7 @@ export function useLoading(fetchMethod, params) {}
 ```
 
 - `fetchMethod` returns a promise with the data.
-- `params` is optional. Forward it to `fetchMethod`. `EntitiesList` calls the hook with the method only. `EntityDetails` also passes `params`.
+- `params` is optional. Forward it to `fetchMethod`. `EntitiesList` calls the hook with the method only . `EntityDetails` also passes `params`.
 - Return `null` until the promise resolves.
 - Return the resolved value itself, not a wrapper object.
 - When `fetchMethod` or `params` changes, return `null` again and fetch once more.
